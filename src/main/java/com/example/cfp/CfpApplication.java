@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
+@EnableConfigurationProperties(CfpProperties.class)
 public class CfpApplication {
 
 	public static void main(String[] args) {
@@ -25,9 +26,10 @@ public class CfpApplication {
 	}
 
 	@Bean
-	public RestTemplate restTemplate(@Value("${CFP_GITHUB_TOKEN:}") String token) {
+	public RestTemplate restTemplate(CfpProperties properties) {
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setInterceptors(Collections.singletonList(new GithubAppTokenInterceptor(token)));
+		restTemplate.setInterceptors(Collections.singletonList(
+				new GithubAppTokenInterceptor(properties.getGithub().getToken())));
 		return restTemplate;
 	}
 
